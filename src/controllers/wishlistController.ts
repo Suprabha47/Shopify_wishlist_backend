@@ -10,14 +10,12 @@ export const addWishlistItem = async (req: Request, res: Response) => {
     const { customerId, productId, variantId, title, handle } =
       data as WishlistItemInput;
 
-    // ✅ Validate customer
     if (!customerId) {
       return res.status(400).json({ message: "Customer ID missing" });
     }
 
     console.log("Customer ID →", customerId);
 
-    // ✅ Ensure customer exists
     let customer = await prisma.customer.findUnique({
       where: { shopifyId: customerId },
     });
@@ -28,12 +26,10 @@ export const addWishlistItem = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ Validate product
     if (!productId) {
       return res.status(400).json({ message: "Product ID missing" });
     }
 
-    // ✅ Check if already exists
     const exists = await prisma.wishlistItem.findFirst({
       where: {
         customerId: customerId,
@@ -45,11 +41,10 @@ export const addWishlistItem = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Item already in wishlist" });
     }
 
-    // ✅ Create wishlist item (correct fields)
     await prisma.wishlistItem.create({
       data: {
-        customerId: customerId, // ✅ string
-        productId: productId, // ✅ string
+        customerId: customerId,
+        productId: productId,
         variantId,
         productTitle: title,
         productHandle: handle,
