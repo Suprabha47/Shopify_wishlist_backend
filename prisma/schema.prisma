@@ -12,14 +12,37 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Shop {
+  id              Int             @id @default(autoincrement())
+  shopifyDomain   String          @unique
+  accessToken     String
+  isActive        Boolean         @default(true)
+  installedAt     DateTime        @default(now())
+  uninstalledAt   DateTime?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  customers       Customer[]      @relation("ShopCustomers")
+  wishlistItems   WishlistItem[]  @relation("ShopWishlistItems")
+}
+
 model Customer {
   id        Int            @id @default(autoincrement())
   shopifyId String         @unique
-  email     String?        @unique
-  phone     String?        @unique
+  email     String?        
+  phone     String?        
   name      String?
   createdAt DateTime       @default(now())
+  shopId    Int     
+          
+  shop      Shop           @relation("ShopCustomers", fields: [shopId], references: [id], onDelete: Cascade)
   wishlist  WishlistItem[] @relation("CustomerWishlist")
+
+  @@unique([shopId, shopifyId])
+  @@unique([shopId, email])
+  @@unique([shopId, phone])
 }
 
 model WishlistItem {
@@ -33,5 +56,7 @@ model WishlistItem {
   productPrice  Float?
   createdAt     DateTime @default(now())
 
+  shopId        Int
+  shop          Shop     @relation("ShopWishlistItems", fields: [shopId], references : [id], onDelete: Cascade)
   customer Customer @relation("CustomerWishlist", fields: [customerId], references: [shopifyId], onDelete: Cascade)
 }

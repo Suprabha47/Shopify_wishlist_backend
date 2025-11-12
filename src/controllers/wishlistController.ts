@@ -2,101 +2,163 @@ import { WishlistItemInput } from "../utils/types";
 import { Request, Response } from "express";
 import prisma from "../db/prisma";
 
-export const addWishlistItem = async (req: Request, res: Response) => {
+export const addWishlistItem = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const {
+    shopifyDomain,
+    customerId,
+    productId,
+    variantId,
+    title,
+    handle,
+    image,
+    price,
+  } = req.body as WishlistItemInput;
+
+  if (!shopifyDomain || !customerId || !productId || !variantId || !title) {
+    res.status(400).json({ message: "Missing data fields." });
+    return;
+  }
+
   try {
-    const data = req.body;
-    console.log("Request Body:", data);
+    const shop = await prisma.shop.findUnique({
+      where: { shopifyDomain },
+    });
 
-    const { customerId, productId, variantId, title, handle } =
-      data as WishlistItemInput;
-
-    if (!customerId) {
-      return res.status(400).json({ message: "Customer ID missing" });
+    if (!shop) {
+      res.status(404).json({ message: "Shop not found." });
+      return;
     }
 
-    console.log("Customer ID →", customerId);
-
-    let customer = await prisma.customer.findUnique({
-      where: { shopifyId: customerId },
+    let customer = await prisma.customer.findFirst({
+      where: {
+        shopId: shop.id,
+        shopifyId: customerId,
+      },
     });
 
     if (!customer) {
       customer = await prisma.customer.create({
-        data: { shopifyId: customerId },
+        data: { shopifyId: customerId, shopId: shop.id },
       });
     }
 
-    if (!productId) {
-      return res.status(400).json({ message: "Product ID missing" });
-    }
-
-    const exists = await prisma.wishlistItem.findFirst({
+    const existingItem = await prisma.wishlistItem.findFirst({
       where: {
+        shopId: shop.id,
         customerId,
-        productId: productId,
+        variantId,
       },
     });
 
-    if (exists) {
-      return res.status(400).json({ message: "Item already in wishlist" });
+    if (existingItem) {
+      res
+        .status(400)
+        .json({ message: "Product already added to  wishlist.", existingItem });
+      return;
     }
 
     await prisma.wishlistItem.create({
       data: {
         customerId,
-        productId: productId,
+        productId,
         variantId,
         productTitle: title,
         productHandle: handle,
+        productImage: image,
+        productPrice: price,
+        shopId: shop.id,
       },
     });
 
-    return res.json({ message: "Added to wishlist" });
+    res.status(201).json({ message: "Added to wishlist!" });
+    return;
   } catch (error) {
-    console.error("Wishlist Add Error:", error);
-    return res.status(500).json({ error: "Failed to add wishlist item" });
+    console.error("Wishlist add error:", error);
+    res.status(500).json({ message: "Error occured.", error });
   }
 };
 
-export const getWishlistItems = async (req: Request, res: Response) => {
+export const getWishlistItems = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { shopifyDomain, customerId } = req.params;
+
+  if (!shopifyDomain || !customerId) {
+    res
+      .status(400)
+      .json({ message: "Shopify domain and customer id is required." });
+    return;
+  }
+
   try {
-    const { customerId } = req.params;
-    if (!customerId)
-      return res.status(400).json({ message: "customer id is required." });
+    const shop = await prisma.shop.findUnique({
+      where: { shopifyDomain },
+    });
+
+    if (!shop) {
+      res.status(404).json({ message: "Shop not found." });
+      return;
+    }
 
     const items = await prisma.wishlistItem.findMany({
-      where: { customerId },
+      where: {
+        shopId: shop.id,
+        customerId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
-    if (!items || items.length === 0)
-      return res.status(404).json({ message: "No wishlist items found." });
-
-    return res.status(200).json({ data: items });
+    res.status(200).json({ items });
   } catch (error) {
-    console.log("Error: ", error);
-    res.status(500).json({ message: "Something went wrong", error });
+    console.error("Get wishlist items error:", error);
+    res.status(500).json({ message: "Something went wrong.", error });
   }
 };
 
-export const removeItemFromWishlist = async (req: Request, res: Response) => {
-  try {
-    const { customerId, variantId } = req.params;
+export const removeItemFromWishlist = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { shopifyDomain, customerId, variantId } = req.params;
 
-    if (!customerId || !variantId)
-      return res
-        .status(400)
-        .json({ message: "customer id and variant id is required." });
+  if (!shopifyDomain || !customerId || !variantId) {
+    res
+      .status(400)
+      .json({
+        message: "Shopify domain, customer id and variant is required.",
+      });
+    return;
+  }
+
+  try {
+    const shop = await prisma.shop.findUnique({
+      where: { shopifyDomain },
+    });
+
+    if (!shop) {
+      res.status(404).json({ message: "Shop not found." });
+      return;
+    }
 
     const result = await prisma.wishlistItem.deleteMany({
-      where: { AND: [{ customerId }, { variantId }] },
+      where: {
+        shopId: shop.id,
+        customerId,
+        variantId,
+      },
     });
 
-    return res.json({
-      message: "Wishlist item removed successfully",
-      deletedCount: result.count,
-    });
+    res
+      .status(200)
+      .json({ message: "Items removed from wishlist.", count: result.count });
   } catch (error) {
-    console.log("Error: ", error);
-    res.status(500).json({ message: "Something went wrong", error });
+    console.error("Remove wishlist item error:", error);
+    res.status(500).json({ message: "Internal Server Error", error });
   }
 };
