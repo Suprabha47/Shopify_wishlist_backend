@@ -39,17 +39,17 @@ model ShopSettings {
   iconFillColor     String?
   iconStyle         String?
   showWishlistCount Boolean? @default(true)
-  backgroundColor   String?
+  // backgroundColor   String?
 
-  productIconColor      String?
+  // productIconColor      String?
   productIconFillColor  String?
-  productShpwIcon       Boolean? @default(true)
+  productShowIcon       Boolean? @default(true)
   productButtonText     String?
   productButtonPosition String?
-  ProductButtonStyle    String?
-  ProductbuttonLabel    String?
+  productButtonStyle    String?
+  // ProductbuttonLabel    String?
 
-  collectionIconColor      String?
+  // collectionIconColor      String?
   collectionIconFillColor  String?
   collectionShowIcon       Boolean? @default(true)
   collectionButtonPosition String?
