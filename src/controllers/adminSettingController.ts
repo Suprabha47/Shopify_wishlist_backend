@@ -70,7 +70,39 @@ export const getSettings = async (req: Request, res: Response) => {
       where: { shopId: shopRecord.id },
     });
 
-    res.status(200).json({ settings });
+    if (!settings) {
+      return res.status(404).json({ message: "Settings not found." });
+    }
+
+    const formattedSettings = {
+      basic: {
+        showWishlistCount: settings.showWishlistCount,
+      },
+
+      product: {
+        buttonColor: settings.buttonColor,
+        textColor: settings.textColor,
+        productShowIcon: settings.productShowIcon,
+        productButtonText: settings.productButtonText,
+        productButtonPosition: settings.productButtonPosition,
+        productButtonStyle: settings.productButtonStyle,
+      },
+
+      collection: {
+        collectionShowIcon: settings.collectionShowIcon,
+        collectionButtonPosition: settings.collectionButtonPosition,
+      },
+
+      wishlist: {
+        wishlistLayoutType: settings.wishlistLayoutType,
+        showPrice: settings.showPrice,
+      },
+    };
+
+    return res.status(200).json({
+      message: "Settings fetched successfully",
+      data: formattedSettings,
+    });
   } catch (error) {
     console.error("Error fetching settings:", error);
     res.status(500).json({ message: "Internal Server Error" });
