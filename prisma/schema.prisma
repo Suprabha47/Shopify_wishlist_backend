@@ -34,29 +34,24 @@ model ShopSettings {
   shopId Int  @unique
   shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
+  // Basic
   buttonColor       String?
   textColor         String?
-  iconFillColor     String?
-  iconStyle         String?
   showWishlistCount Boolean? @default(true)
-  // backgroundColor   String?
 
-  // productIconColor      String?
-  productIconFillColor  String?
+  // Product
   productShowIcon       Boolean? @default(true)
   productButtonText     String?
   productButtonPosition String?
   productButtonStyle    String?
-  // ProductbuttonLabel    String?
 
-  // collectionIconColor      String?
-  collectionIconFillColor  String?
+  // Collection
   collectionShowIcon       Boolean? @default(true)
   collectionButtonPosition String?
 
+  // Wishlist Page
   wishlistLayoutType String?
   showPrice          Boolean? @default(true)
-  showStock          Boolean? @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
