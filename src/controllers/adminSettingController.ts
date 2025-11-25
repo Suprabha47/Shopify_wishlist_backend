@@ -4,7 +4,8 @@ import prisma from "../db/prisma";
 export const saveSettings = async (req: Request, res: Response) => {
   try {
     const { shop, settings } = req.body;
-
+    const query = req.query;
+    console.log("full query add setting:", query);
     if (!shop || !settings) {
       return res
         .status(400)
@@ -53,7 +54,8 @@ export const saveSettings = async (req: Request, res: Response) => {
 export const getSettings = async (req: Request, res: Response) => {
   try {
     const { shop } = req.query;
-
+    const query = req.query;
+    console.log("full query get settng", query);
     if (!shop) {
       return res.status(400).json({ message: "Shop domain is required." });
     }

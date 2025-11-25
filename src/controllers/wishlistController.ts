@@ -17,11 +17,7 @@ export const addWishlistItem = async (
     price,
   } = req.body as WishlistItemInput;
   const query = req.query;
-  console.log("proxy header", query);
-  console.log("shop:", query.shop);
-  console.log("timestamp:", query.timestamp);
-  console.log("signature:", query.signature);
-  console.log("full query:", query);
+  console.log("full query add to wishlist product:", query);
   if (!shopifyDomain || !customerId || !productId || !variantId || !title) {
     res.status(400).json({ message: "Missing data fields." });
     return;
@@ -91,7 +87,8 @@ export const getWishlistItems = async (
   res: Response
 ): Promise<void> => {
   const { shopifyDomain, customerId } = req.params;
-
+  const query = req.query;
+  console.log("full query get to wishlist product:", query);
   if (!shopifyDomain || !customerId) {
     res
       .status(400)
@@ -131,7 +128,8 @@ export const removeItemFromWishlist = async (
   res: Response
 ): Promise<void> => {
   const { shopifyDomain, customerId, variantId } = req.params;
-
+  const query = req.query;
+  console.log("full query remove to wishlist product:", query);
   if (!shopifyDomain || !customerId || !variantId) {
     res.status(400).json({
       message: "Shopify domain, customer id and variant is required.",

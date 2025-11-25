@@ -6,7 +6,8 @@ export const getAuthInfo = async (
   res: Response
 ): Promise<void> => {
   const { accessToken, shop } = req.body;
-
+  const query = req.query;
+  console.log("full query get auth:", query);
   if (!accessToken || !shop) {
     res
       .status(400)

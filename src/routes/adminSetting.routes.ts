@@ -3,11 +3,12 @@ import {
   saveSettings,
   getSettings,
 } from "../controllers/adminSettingController";
-import { verifyApiKey } from "../middleware/auth.middleware";
+import { verifyShopifyProxy } from "../middleware/auth.middleware";
 
 const router = express.Router();
 // router.use(verifyApiKey);
-router.post("/save", saveSettings);
-router.get("/", getSettings);
+router.use(verifyShopifyProxy);
+router.post("/save", verifyShopifyProxy, saveSettings);
+router.get("/", verifyShopifyProxy, getSettings);
 
 export default router;
