@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "ShopSettings" ALTER COLUMN "productButtonText" SET DATA TYPE TEXT,
+ALTER COLUMN "addToCartText" SET DATA TYPE TEXT,
+ALTER COLUMN "pageHeading" SET DATA TYPE TEXT,
+ALTER COLUMN "productButtonAfterText" SET DATA TYPE TEXT;
