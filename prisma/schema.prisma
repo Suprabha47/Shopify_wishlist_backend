@@ -30,6 +30,38 @@ model Shop {
   settings      ShopSettings?
 }
 
+// model ShopSettings {
+//   id     Int  @id @default(autoincrement())
+//   shopId Int  @unique
+//   shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+//   // Basic
+//   buttonColor       String?
+//   textColor         String?
+//   showWishlistCount Boolean? @default(true)
+
+//   // Product
+//   productShowIcon        Boolean? @default(true)
+//   productButtonText      String?
+//   productButtonAfterText String?
+//   productButtonPosition  String?
+//   productButtonStyle     String?
+
+//   // Collection
+//   collectionShowIcon       Boolean? @default(true)
+//   collectionButtonPosition String?
+
+//   // Wishlist Page
+//   wishlistLayoutType String?
+//   showPrice          Boolean? @default(true)
+//   pageHeading        String?
+//   showAddToCart      Boolean? @default(true)
+//   addToCartText      String?
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
 model ShopSettings {
   id     Int  @id @default(autoincrement())
   shopId Int  @unique
@@ -42,8 +74,8 @@ model ShopSettings {
 
   // Product
   productShowIcon        Boolean? @default(true)
-  productButtonText      String?
-  productButtonAfterText String?
+  productButtonText      Json?
+  productButtonAfterText Json?
   productButtonPosition  String?
   productButtonStyle     String?
 
@@ -54,9 +86,9 @@ model ShopSettings {
   // Wishlist Page
   wishlistLayoutType String?
   showPrice          Boolean? @default(true)
-  pageHeading        String?
+  pageHeading        Json?
   showAddToCart      Boolean? @default(true)
-  addToCartText      String?
+  addToCartText      Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
